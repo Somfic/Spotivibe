@@ -51,5 +51,5 @@ export function logout(): void {
 
 export function requestLogin(): void {
 	logout();
-	window.location.href = 'http://localhost:5000/login';
+	window.location.href = 'https://spotivibe.vercel.app/api/login';
 }
