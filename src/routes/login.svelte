@@ -5,6 +5,8 @@
 	import {spotify, login, requestLogin} from '../lib/spotify';
     import Button from '$lib/button.svelte';
 
+	import SpotifyWebApi from "spotify-web-api-node";
+
 	var couldLogIn = false;
 
 	onMount(async () => {
@@ -17,12 +19,43 @@
 
 
 	var user: SpotifyApi.CurrentUsersProfileResponse;
+
+	function greetingMessage() : string {
+
+		const timeGreetings = timeGreeting();
+		const generalGreetings = ['Howdy', 'Hi', 'Sup', 'Hello', 'Hey', 'Hey there', 'Hi there']
+		const names = ['DJ', 'rockstar']
+		const suffixes = ['!', '']
+
+		var greeting = generalGreetings[Math.floor(Math.random() * generalGreetings.length)];
+		if(Math.random() < 0.5) {
+			greeting = timeGreetings[Math.floor(Math.random() * timeGreetings.length)];
+		}
+
+		var name = names[Math.floor(Math.random() * names.length)];
+		var suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+
+	
+		return greeting + ', ' + name + suffix;
+	}
+
+	function timeGreeting() : string[] {
+		var time = new Date().getHours();
+
+		if (time < 12) {
+			return ["Morning", "Mornin'", "Good morning", "Good mornin'"]
+		} else if (time < 18) {
+			return ["Afternoon"];
+		} else {
+			return ["Evening", "Evenin'"];
+		}
+	}
 </script>
 
 <div class="prompt-wrapper">
 	<div class="prompt">
 		{#if !couldLogIn}
-			<h1 class="fat">Hey there, DJ</h1>
+			<h1 class="fat">{greetingMessage()}</h1>
 			<Button type="primary" action={requestLogin} text="Log in with Spotify"></Button>
 		{:else}
 			<h1>Logging you in ...</h1>

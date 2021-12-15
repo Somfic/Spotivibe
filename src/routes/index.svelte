@@ -10,6 +10,8 @@ import { goto } from '$app/navigation';
 
 	import {spotify, logout} from '../lib/spotify';
 
+	import SpotifyWebApi from "spotify-web-api-node";
+
 	onMount(async () => {
 		user = (await spotify.getMe()).body;
 	});
