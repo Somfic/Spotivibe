@@ -16,6 +16,9 @@ export default (req, res) => {
           return res.send(error).status(500);
         }
 
+        spotifyApi.setAccessToken(data.body.access_token);
+        spotifyApi.setRefreshToken(data.body.refresh_token);
+
         const params = new URLSearchParams({
           refresh_token: data.body.refresh_token,
           access_token: data.body.access_token,
@@ -23,6 +26,9 @@ export default (req, res) => {
           scopes: data.body.scope,
           token_type: data.body.token_type,
         });
+
+        const user = await spotifyApi.getMe();
+        console.log('Authenticated user: ', JSON.stringify(user.body));
 
         res.redirect(process.env["FRONTEND_CALLBACK_URI"] + "/?" + params);
       }
