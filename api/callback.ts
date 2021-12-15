@@ -16,7 +16,7 @@ export default (req, res) => {
           return res.send(error).status(500);
         }
 
-        var params = new URLSearchParams({
+        const params = new URLSearchParams({
           refresh_token: data.body.refresh_token,
           access_token: data.body.access_token,
           expires_in: data.body.expires_in.toString(),
