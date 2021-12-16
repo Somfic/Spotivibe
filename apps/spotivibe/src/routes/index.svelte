@@ -18,7 +18,7 @@
 
 	onMount(async () => {
 		if (localStorage.getItem("access_token") == null) {
-			navigate("/login", {replace: true})
+			navigate("/login")
 		}
 
 		loginWithTokens(localStorage.getItem("access_token"), localStorage.getItem("refresh_token"))
@@ -52,7 +52,7 @@
 				text="Logout"
 				action={() => {
 					logout();
-					navigate('/login', { replace: true });
+					navigate('/login');
 				}}
 			/>
 		</div>

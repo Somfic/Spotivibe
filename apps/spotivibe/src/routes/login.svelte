@@ -12,7 +12,7 @@
         couldLogIn = login();
 
         if(couldLogIn) {
-			navigate("/", { replace: true });
+			navigate("/loggedin");
         }
 	});
 
