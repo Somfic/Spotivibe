@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { navigate } from "svelte-routing";
 	import { onMount } from 'svelte';
 	// import { goto } from '$app/navigation';
 
 	import {spotify, login, requestLogin} from '../lib/spotify';
-    // import Button from '$lib/button.svelte';
+    import Button from '../lib/button.svelte';
 
-	import SpotifyWebApi from "spotify-web-api-node";
+	// import type SpotifyWebApi from "spotify-web-api-node";
 
 	var couldLogIn = false;
 
@@ -13,12 +14,13 @@
         couldLogIn = login();
 
         if(couldLogIn) {
+			navigate("/", { replace: true });
             // goto('/');
         }
 	});
 
 
-	var user: SpotifyApi.CurrentUsersProfileResponse;
+	// var user: SpotifyWebApi.CurrentUsersProfileResponse;
 
 	function greetingMessage() : string {
 
@@ -53,15 +55,15 @@
 </script>
 
 <main>
-	<div class="prompt-wrapper">d
+	<div class="prompt-wrapper">
 		<div class="prompt">
-			<!-- {#if !couldLogIn}
+			{#if !couldLogIn}
 				<h1 class="fat">{greetingMessage()}</h1>
 				<Button type="primary" action={requestLogin} text="Log in with Spotify"></Button>
 			{:else}
 				<h1>Logging you in ...</h1>
 				<p>Please wait ...</p>
-			{/if} -->
+			{/if}
 		</div>
 	</div>
 </main>
