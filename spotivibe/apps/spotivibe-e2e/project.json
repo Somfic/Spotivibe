@@ -1,0 +1,28 @@
+{
+  "root": "apps/spotivibe-e2e",
+  "sourceRoot": "apps/spotivibe-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "executor": "@nrwl/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/spotivibe-e2e/cypress.json",
+        "devServerTarget": "spotivibe:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "spotivibe:serve:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/spotivibe-e2e/**/*.{js,ts}"]
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["spotivibe"]
+}
