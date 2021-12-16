@@ -36,6 +36,7 @@
     "cookie": "^0.4.1",
     "emoji-data-css": "^1.0.1",
     "node-sass": "^7.0.0",
+    "node-vibrant": "3.1.6",
     "sass": "^1.45.0",
     "spotify-web-api-node": "^5.0.2"
   }
