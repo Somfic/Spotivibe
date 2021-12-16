@@ -16,16 +16,34 @@
 
 	onMount(async () => {
 		user = (await spotify.getMe()).body;
-		var colors = await extract(user?.images[0].url);
-		backgroundColor = colors.DarkMuted.hex;
+		backgroundColor = (await extract(user?.images[0].url)).DarkMuted.hex;
 
+		// Update loop
+		setInterval(async () => {
+			await updateSongInfo();
+		}, 5000);
+
+		await updateSongInfo();
+	});
+
+	async function updateSongInfo() {
 		var playback = (await spotify.getMyCurrentPlaybackState()).body;
 
-		if(playback?.is_playing) {
-			var track = (await spotify.getTrack(playback.item.id)).body;
-			console.log(playback.progress_ms / track.duration_ms * 100 + "%")
+		isPlaying = playback.is_playing;
+
+		if (playback?.is_playing) {
+			song = (await spotify.getTrack(playback.item.id)).body;
+			//analysis = (await spotify.getAudioAnalysisForTrack(playback.item.id)).body;
+
+			backgroundColor = (await extract(song?.album.images[0].url)).Muted.hex;
+
+			//console.log(analysis)
 		}
-	});
+	}
+
+	var isPlaying: boolean = false;
+	var song: SpotifyApi.SingleTrackResponse = undefined;
+	var analysis: SpotifyApi.AudioAnalysisResponse = undefined;
 
 	var user: SpotifyApi.CurrentUsersProfileResponse = undefined;
 	var backgroundColor = '#000000';
@@ -36,15 +54,26 @@
 		<h1>One sec</h1>
 	{:else}
 		<h1>Hi {user?.display_name}</h1>
-		<Image source={user?.images[0].url} width={400} height={400} />
-		<Button
-			type="cancel"
-			text="Logout"
-			action={() => {
-				logout();
-				goto('/login');
-			}}
-		/>
+		{#if isPlaying}
+			<h2>
+				Playing <span class="fat">{song?.name}</span> by {song?.artists[0].name}
+			</h2>
+			<Image source={song?.album.images[0].url} width={400} height={400} />
+		{:else}
+			<h2>You're currently not playing any music</h2>
+			<Image source={user?.images[0].url} width={400} height={400} />
+		{/if}
+
+		<div>
+			<Button
+				type="cancel"
+				text="Logout"
+				action={() => {
+					logout();
+					goto('/login');
+				}}
+			/>
+		</div>
 	{/if}
 </main>
 
