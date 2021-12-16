@@ -51,5 +51,12 @@ export function logout(): void {
 
 export function requestLogin(): void {
 	logout();
-	window.location.href = 'https://spotivibe.vercel.app/api/login';
+
+	const isDev = window.location.hostname === 'localhost';
+
+	if(isDev) {
+		window.location.href = 'http://localhost:3000/api/login';
+	} else {
+		window.location.href = 'https://spotivibe.vercel.app/api/login';
+	}
 }
