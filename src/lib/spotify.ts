@@ -1,8 +1,46 @@
+import Vibrant from 'node-vibrant';
 import SpotifyWebApi from 'spotify-web-api-node';
+import { Current } from './Current';
 
 export const spotify = new SpotifyWebApi();
 
-export function login() : boolean {
+export const current: Current = new Current();
+
+let lastRefresh = 0;
+export async function process() : Promise<void> {
+
+	// Only refresh every 5 seconds
+	if (Date.now() - lastRefresh < 5000) {
+		return;
+	}
+	lastRefresh = Date.now();
+
+	// Set the user if we haven't yet
+	if(current.user == undefined) {
+		current.user = (await spotify.getMe()).body;
+	}
+
+	// Get the current playback
+	const playback = (await spotify.getMyCurrentPlaybackState()).body;
+	current.isPlaying = playback?.is_playing;
+
+	// Only refresh if we're playing
+	if (playback?.is_playing) {
+		const song = (await spotify.getTrack(playback.item.id)).body;
+
+		// Only update the audio analysis if the song has changed
+		if (current.song == undefined || song?.id !== current.song.id) {
+			current.song = song;
+			current.analysis = (await spotify.getAudioAnalysisForTrack(playback?.item.id)).body;
+			current.analysis = (await spotify.getAudioFeaturesForTrack(playback?.item.id)).body;
+			current.colors = await Vibrant.from(song?.album.images[0].url).getPalette();
+
+			console.log(`New song: ${song?.name} by ${song?.artists[0].name}`);
+		}
+	}
+}
+
+export function login(): boolean {
 	const urlParams = new URLSearchParams(window.location.search);
 
 	const hasAccessToken = urlParams.has('access_token');
@@ -21,17 +59,13 @@ export function login() : boolean {
 
 		loginWithTokens(accessToken, refreshToken);
 		return true;
-	} 
-	
-	else if (hasCachedTokens) {
+	} else if (hasCachedTokens) {
 		loginWithTokens(cachedAccessToken, cachedRefreshToken);
 		return true;
-	} 
-	
-	else {
+	} else {
 		return false;
 	}
-} 
+}
 
 function loginWithTokens(accessToken: string, refreshToken: string) {
 	localStorage.setItem('access_token', accessToken);
@@ -54,7 +88,7 @@ export function requestLogin(): void {
 
 	const isDev = window.location.hostname === 'localhost';
 
-	if(isDev) {
+	if (isDev) {
 		window.location.href = 'http://localhost:3000/api/login';
 	} else {
 		window.location.href = 'https://spotivibe.vercel.app/api/login';

@@ -2,10 +2,8 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 
-	import {spotify, login, requestLogin} from '../lib/spotify';
+	import {login, requestLogin} from '../lib/spotify';
     import Button from '$lib/button.svelte';
-
-	import SpotifyWebApi from "spotify-web-api-node";
 
 	var couldLogIn = false;
 
@@ -16,9 +14,6 @@
             goto('/');
         }
 	});
-
-
-	var user: SpotifyApi.CurrentUsersProfileResponse;
 
 	function greetingMessage() : string {
 
