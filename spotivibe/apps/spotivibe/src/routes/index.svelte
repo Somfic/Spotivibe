@@ -9,12 +9,13 @@
 	import { onMount } from 'svelte';
 	import { extract } from '../lib/colors';
 
-	import { spotify, logout } from '../lib/spotify';
+	import { spotify, logout, loginWithTokens } from '../lib/spotify';
 
 	import SpotifyWebApi from 'spotify-web-api-node';
-	import Image from '$lib/image.svelte';
+	import Image from '../lib/image.svelte';
 
 	onMount(async () => {
+		loginWithTokens(localStorage.getItem("access_token"), localStorage.getItem("refresh_token"))
 		user = (await spotify.getMe()).body;
 		var colors = await extract(user?.images[0].url);
 		backgroundColor = colors.DarkMuted.hex;

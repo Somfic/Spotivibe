@@ -9,31 +9,22 @@ export function login() : boolean {
 	const hasRefreshToken = urlParams.has('refresh_token');
 
 	const isLoginCallback = hasAccessToken && hasRefreshToken;
-
-	const cachedAccessToken = localStorage.getItem('access_token');
-	const cachedRefreshToken = localStorage.getItem('refresh_token');
-
-	const hasCachedTokens = cachedAccessToken && cachedRefreshToken;
-
 	if (isLoginCallback) {
-		const accessToken = urlParams.get('access_token');
-		const refreshToken = urlParams.get('refresh_token');
-
-		loginWithTokens(accessToken, refreshToken);
-		return true;
-	} 
-	
-	else if (hasCachedTokens) {
-		loginWithTokens(cachedAccessToken, cachedRefreshToken);
-		return true;
-	} 
-	
-	else {
-		return false;
+		localStorage.setItem('access_token', urlParams.get('access_token'));
+		localStorage.setItem('refresh_token', urlParams.get('refresh_token'));
 	}
+
+	const accessToken = localStorage.getItem('access_token');
+	const refreshToken = localStorage.getItem('refresh_token');
+	
+	if (accessToken && refreshToken) {
+		loginWithTokens(accessToken, refreshToken);
+	}
+	
+	return accessToken !== null;
 } 
 
-function loginWithTokens(accessToken: string, refreshToken: string) {
+export function loginWithTokens(accessToken: string, refreshToken: string) {
 	localStorage.setItem('access_token', accessToken);
 	localStorage.setItem('refresh_token', refreshToken);
 
@@ -52,5 +43,5 @@ export function logout(): void {
 export function requestLogin(): void {
 	logout();
 
-	window.location.href = `${window.location.origin}/api/login`;
+	window.location.href = `http://localhost:3333/api/login`;
 }
