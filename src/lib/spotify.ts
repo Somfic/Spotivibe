@@ -52,11 +52,5 @@ export function logout(): void {
 export function requestLogin(): void {
 	logout();
 
-	const isDev = window.location.hostname === 'localhost';
-
-	if(isDev) {
-		window.location.href = 'http://localhost:3000/api/login';
-	} else {
-		window.location.href = process.env.VITE_VERCEL_URL;
-	}
+	window.location.href = `${window.location.origin}/api/login`;
 }

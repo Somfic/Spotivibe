@@ -2,10 +2,12 @@ import SpotifyWebApi from "spotify-web-api-node";
 
 export default (req, res) => {
   try {
+    console.log(req.headers["x-forwarded-proto"])
+    console.log(`${process.env.VERCEL_URL}/api/callback/`);
     const spotifyApi = new SpotifyWebApi({
       clientId: process.env.SPOTIFY_CLIENT_ID,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      redirectUri: `https://${process.env.VERCEL_URL}/`,
+      redirectUri: `${process.env.SPOTIFY_REDIRECT_URL}/api/callback/`,
     });
 
     // Retrieve an access token
@@ -30,10 +32,10 @@ export default (req, res) => {
         const user = await spotifyApi.getMe();
         console.log('Authenticated user: ', JSON.stringify(user.body));
 
-        res.redirect(process.env.VERCEL_URL + "/?" + params);
+        res.redirect(`${process.env.SPOTIFY_REDIRECT_URL}/login` + "/?" + params);
       }
     );
   } catch (err) {
-    res.redirect(process.env.VERCEL_URL + "/?error=" + err);
+    res.redirect(`${process.env.SPOTIFY_REDIRECT_URL}/login` + "/?error=" + err);
   }
 };
