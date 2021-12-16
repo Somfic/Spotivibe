@@ -3,29 +3,29 @@
 </script>
 
 <script lang="ts">
-	// import { goto } from '$app/navigation';
+	import { navigate } from "svelte-routing";
 
-	import Button from '$lib/button.svelte';
+	import Button from '../lib/button.svelte';
 	import { onMount } from 'svelte';
-	// import { extract } from '$lib/colors';
+	import { extract } from '../lib/colors';
 
 	import { spotify, logout } from '../lib/spotify';
 
 	import SpotifyWebApi from 'spotify-web-api-node';
 	import Image from '$lib/image.svelte';
 
-	// onMount(async () => {
-	// 	user = (await spotify.getMe()).body;
-	// 	// var colors = await extract(user?.images[0].url);
-	// 	backgroundColor = colors.DarkMuted.hex;
+	onMount(async () => {
+		user = (await spotify.getMe()).body;
+		var colors = await extract(user?.images[0].url);
+		backgroundColor = colors.DarkMuted.hex;
 
-	// 	var playback = (await spotify.getMyCurrentPlaybackState()).body;
+		var playback = (await spotify.getMyCurrentPlaybackState()).body;
 
-	// 	if(playback?.is_playing) {
-	// 		var track = (await spotify.getTrack(playback.item.id)).body;
-	// 		console.log(playback.progress_ms / track.duration_ms * 100 + "%")
-	// 	}
-	// });
+		if(playback?.is_playing) {
+			var track = (await spotify.getTrack(playback.item.id)).body;
+			console.log(playback.progress_ms / track.duration_ms * 100 + "%")
+		}
+	});
 
 	var user: SpotifyApi.CurrentUsersProfileResponse = undefined;
 	var backgroundColor = '#000000';
@@ -42,7 +42,7 @@
 			text="Logout"
 			action={() => {
 				logout();
-				goto('/login');
+				navigate('/login', { replace: true });
 			}}
 		/>
 	{/if}

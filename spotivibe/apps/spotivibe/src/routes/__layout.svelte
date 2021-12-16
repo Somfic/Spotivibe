@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import '../app.scss';
 
 	import {spotify} from '../lib/spotify';
@@ -14,4 +14,4 @@
 	});
 </script>
 
-<slot />
+<slot /> -->

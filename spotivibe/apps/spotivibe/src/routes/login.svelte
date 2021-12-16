@@ -1,12 +1,10 @@
 <script lang="ts">
+	import SpotifyWebApi from 'spotify-web-api-node';
 	import { navigate } from "svelte-routing";
 	import { onMount } from 'svelte';
-	// import { goto } from '$app/navigation';
 
 	import {spotify, login, requestLogin} from '../lib/spotify';
     import Button from '../lib/button.svelte';
-
-	// import type SpotifyWebApi from "spotify-web-api-node";
 
 	var couldLogIn = false;
 
@@ -15,12 +13,10 @@
 
         if(couldLogIn) {
 			navigate("/", { replace: true });
-            // goto('/');
         }
 	});
 
-
-	// var user: SpotifyWebApi.CurrentUsersProfileResponse;
+	var user: SpotifyApi.CurrentUsersProfileResponse;
 
 	function greetingMessage() : string {
 
