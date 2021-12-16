@@ -11,7 +11,7 @@ export default (req, res) => {
   const spotifyApi = new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    redirectUri: process.env.SPOTIFY_CALLBACK_URI,
+    redirectUri: process.env.VERCEL_URL,
   });
 
   // Generate a random string for the state
