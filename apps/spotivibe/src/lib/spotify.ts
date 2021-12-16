@@ -19,7 +19,6 @@ export async function process() : Promise<Current> {
 	// Set the user if we haven't yet
 	if(current.user == undefined) {
 		current.user = (await spotify.getMe()).body;
-		return current;
 	}
 
 	// Get the current playback
@@ -40,6 +39,8 @@ export async function process() : Promise<Current> {
 			console.log(`New song: ${song?.name} by ${song?.artists[0].name}`);
 		}
 	}
+	
+	return current;
 }
 
 export function login() : boolean {
