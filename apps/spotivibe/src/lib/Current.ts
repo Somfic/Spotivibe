@@ -10,6 +10,8 @@ export class Current {
     colors: Palette
     
     isPlaying: boolean
+
+    imageUri: string
    
     // Default constructor
     constructor() {
@@ -18,6 +20,7 @@ export class Current {
         this.analysis = undefined;
         this.features = undefined;
         this.colors = undefined;
+        this.imageUri = '',
         this.isPlaying = false;
     }
 };
