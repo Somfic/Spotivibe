@@ -32,7 +32,7 @@
 
 	main {
 		position: relative;
-		transition: background all ease;
+		transition: background 1.5s ease;
 	}
 
 	#overlay, #visualiser {

@@ -11,7 +11,7 @@
 </script>
 
 <section>
-  {#if $current?.user == undefined}
+  {#if $current?.user == undefined || $current.analysis?.sections == undefined}
     <div class="prompt">
       <h1>One sec</h1>
     </div>
@@ -37,6 +37,14 @@
   section {
     display: flex;
     flex-grow: 1;
+
+	.prompt {
+		display: flex;
+		flex-grow: 1;
+		align-items: center;
+		justify-content: center;
+	}
+		
     .no-music {
       flex-grow: 1;
       display: flex;
