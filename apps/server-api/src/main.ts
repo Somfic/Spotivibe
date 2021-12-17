@@ -49,9 +49,7 @@ app.get('/api/callback', (req, res) => {
 app.get('/api/login', (req, res) => {
   const scopes = [
     "user-read-private",
-    "user-read-email",
-    "user-read-playback-state",
-    "user-modify-playback-state",
+    "user-read-playback-state"
   ];
 
   const spotifyApi = new SpotifyWebApi({
