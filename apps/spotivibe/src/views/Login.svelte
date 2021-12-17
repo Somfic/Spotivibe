@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import Button from '../components/Button.svelte';
+  import Button from '../components/button.svelte';
   import { isLoginCallback, handleCallback, login} from '../lib/authentication';
 
   var couldLogIn = false;
