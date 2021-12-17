@@ -106,7 +106,7 @@ function getPart(parts, elapsed: number) {
   const filter = parts.filter((x) => x.start <= elapsed);
   const part = parts[filter.length - 1];
 
-  if (part.start) {
+  if (part?.start) {
     part.elapsed = (elapsed - part.start) / part.duration;
   }
 

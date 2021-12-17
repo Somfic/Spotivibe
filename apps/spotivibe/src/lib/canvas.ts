@@ -74,6 +74,10 @@ const animate = () => {
 
   const c = get(current);
 
+  if (c.analysis == undefined || c.analysis.sections == undefined) {
+    return;
+  }
+
   barMaterial.color = new THREE.Color(c.colors?.LightMuted.hex);
   beatMaterial.color = new THREE.Color(c.colors?.LightVibrant.hex);
   sectionMaterial.color = new THREE.Color(c.colors?.Vibrant.hex);
