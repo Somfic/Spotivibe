@@ -5,25 +5,39 @@ import type { Current } from './Current';
 import { current, isLoggedIn } from './stores';
 
 import { get } from 'svelte/store';
+import type { Analysis } from './Analysis';
 
 export const spotify = new SpotifyWebApi();
 
 const REFRESH_RATE = 2500;
 
+let startedAt = Date.now();
+
 let lastRefresh = 0;
-export async function process(): Promise<Current> {
+export async function process(): Promise<void> {
   // Don't process if we're not logged in
   if (!get(isLoggedIn)) {
     return;
   }
 
+  let newCurrent = get(current);
+
+  newCurrent = await processSong(newCurrent);
+
+  if (newCurrent.playback?.is_playing) {
+    newCurrent = processBeat(newCurrent);
+  }
+
+  current.set(newCurrent);
+}
+
+async function processSong(newCurrent: Current): Promise<Current> {
   // Only refresh every 5 seconds
   if (Date.now() - lastRefresh < REFRESH_RATE) {
-    return;
+    return newCurrent;
   }
-  lastRefresh = Date.now();
 
-  const newCurrent = get(current);
+  lastRefresh = Date.now();
 
   try {
     // Set the user if we haven't yet
@@ -32,23 +46,24 @@ export async function process(): Promise<Current> {
     }
 
     // Get the current playback
-    const playback = (await spotify.getMyCurrentPlaybackState()).body;
-    newCurrent.isPlaying = playback?.is_playing;
+    newCurrent.playback = (await spotify.getMyCurrentPlaybackState()).body;
+    startedAt = Date.now() - newCurrent.playback.progress_ms;
 
     // Only refresh if we're playing
-    if (playback?.is_playing) {
-      const song = (await spotify.getTrack(playback.item.id)).body;
+    if (newCurrent.playback?.is_playing) {
+      const song = (await spotify.getTrack(newCurrent.playback.item.id)).body;
 
       const old = get(current);
 
       // Only update the audio analysis if the song has changed
       if (old.song == undefined || song?.id !== old.song.id) {
         newCurrent.song = song;
-        newCurrent.analysis = (
-          await spotify.getAudioAnalysisForTrack(playback?.item.id)
-        ).body;
+        newCurrent.analysis = <Analysis>(
+          (await spotify.getAudioAnalysisForTrack(newCurrent.playback?.item.id))
+            .body
+        );
         newCurrent.features = (
-          await spotify.getAudioFeaturesForTrack(playback?.item.id)
+          await spotify.getAudioFeaturesForTrack(newCurrent.playback?.item.id)
         ).body;
         newCurrent.colors = await Vibrant.from(
           song?.album.images[0].url
@@ -56,6 +71,7 @@ export async function process(): Promise<Current> {
         newCurrent.imageUri = song?.album.images[0].url;
 
         console.log(`New song: ${song?.name} by ${song?.artists[0].name}`);
+        console.log(newCurrent.analysis);
       }
     } else {
       newCurrent.colors = await Vibrant.from(
@@ -63,55 +79,36 @@ export async function process(): Promise<Current> {
       ).getPalette();
       newCurrent.imageUri = newCurrent.user.images[0].url;
     }
-
-    current.set(newCurrent);
   } catch (e) {
-    if(e.toString().includes('No token provided')) {
-		isLoggedIn.set(false);
-	}
-  }
-}
-
-export function login(): boolean {
-  const urlParams = new URLSearchParams(window.location.search);
-
-  const hasAccessToken = urlParams.has('access_token');
-  const hasRefreshToken = urlParams.has('refresh_token');
-
-  const isLoginCallback = hasAccessToken && hasRefreshToken;
-  if (isLoginCallback) {
-    localStorage.setItem('access_token', urlParams.get('access_token'));
-    localStorage.setItem('refresh_token', urlParams.get('refresh_token'));
+    if (e.toString().includes('No token provided')) {
+      isLoggedIn.set(false);
+    }
   }
 
-  const accessToken = localStorage.getItem('access_token');
-  const refreshToken = localStorage.getItem('refresh_token');
+  return newCurrent;
+}
 
-  if (accessToken && refreshToken) {
-    loginWithTokens(accessToken, refreshToken);
+function processBeat(current: Current): Current {
+  const elapsed = (Date.now() - startedAt) / 1000;
+
+  if (current.analysis != undefined) {
+    current.analysis.bar = getPart(current.analysis.bars, elapsed);
+    current.analysis.beat = getPart(current.analysis.beats, elapsed);
+    current.analysis.section = getPart(current.analysis.sections, elapsed);
+    current.analysis.segment = getPart(current.analysis.segments, elapsed);
+    current.analysis.tatum = getPart(current.analysis.tatums, elapsed);
   }
 
-  return accessToken !== null;
+  return current;
 }
 
-export function loginWithTokens(accessToken: string, refreshToken: string) {
-  localStorage.setItem('access_token', accessToken);
-  localStorage.setItem('refresh_token', refreshToken);
+function getPart(parts, elapsed: number) {
+  const filter = parts.filter((x) => x.start <= elapsed);
+  const part = parts[filter.length - 1];
 
-  spotify.setAccessToken(accessToken);
-  spotify.setRefreshToken(refreshToken);
-}
+  if (part.start) {
+    part.elapsed = (elapsed - part.start) / part.duration;
+  }
 
-export function logout(): void {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-
-  spotify.setAccessToken('');
-  spotify.setRefreshToken('');
-}
-
-export function requestLogin(): void {
-  logout();
-
-  window.location.href = `http://localhost:3333/api/login`;
+  return part;
 }

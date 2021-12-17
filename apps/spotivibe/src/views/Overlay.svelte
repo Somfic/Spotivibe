@@ -15,10 +15,10 @@
     <div class="prompt">
       <h1>One sec</h1>
     </div>
-  {:else if $current.isPlaying}
+  {:else if $current.playback?.is_playing}
     <div class="music">
       <div class="playback">
-        <img src={$current.imageUri} alt={$current.song.name} />
+        <img src={$current.imageUri} alt={$current.song?.name} />
         <div class="song">
           <h1 class="fat">{$current.song?.name}</h1>
           <h2>{$current.song?.artists[0].name}</h2>
@@ -37,11 +37,6 @@
   section {
     display: flex;
     flex-grow: 1;
-
-    * {
-      pointer-events: all;
-    }
-
     .no-music {
       flex-grow: 1;
       display: flex;
