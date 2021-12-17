@@ -1,20 +1,25 @@
-<script lang="ts">
-	import { Router, Link, Route } from "svelte-routing";
-	import Login from "./routes/login.svelte";
-	import Index from "./routes/index.svelte";
-
-	export let name: string;
-	export let url = "";
+<script context="module" lang="ts">
+	export const prerender = true;
 </script>
-<Router url="{url}">
-	<Route path="/login" component="{Login}" />
-	<Route path="/loggedin" component="{Index}" />
-</Router>
-<!-- <main>
-	<h1>Welcome to {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main> -->
 
-<!-- <style>
-	
-</style> -->
+<script lang="ts">
+	import { onMount } from 'svelte';
+
+	import { process } from './lib/spotify';
+	import { isLoggedIn } from './lib/stores';
+
+	import Home from "./views/Home.svelte";
+	import Login from "./views/Login.svelte";
+
+	onMount(async () => {
+		setInterval(async () => await process(), 1);
+	});
+
+
+</script>
+
+{#if $isLoggedIn}
+	<Home />
+{:else}
+	<Login />
+{/if}

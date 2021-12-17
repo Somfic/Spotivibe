@@ -38,11 +38,11 @@ app.get('/api/callback', (req, res) => {
         const user = await spotifyApi.getMe();
         console.log('Authenticated user: ', JSON.stringify(user.body));
 
-        res.redirect(`${process.env.SPOTIFY_REDIRECT_URL}/login` + "/?" + params);
+        res.redirect(`${process.env.SPOTIFY_REDIRECT_URL}?${params}`);
       }
     );
   } catch (err) {
-    res.redirect(`${process.env.SPOTIFY_REDIRECT_URL}/login` + "/?error=" + err);
+    res.redirect(`${process.env.SPOTIFY_REDIRECT_URL}?error=${err}`);
   }
 });
 
