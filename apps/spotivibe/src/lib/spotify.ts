@@ -58,8 +58,6 @@ export async function process(): Promise<Current> {
         console.log(`New song: ${song?.name} by ${song?.artists[0].name}`);
       }
     } else {
-      console.log(newCurrent.user.images[0].url);
-
       newCurrent.colors = await Vibrant.from(
         newCurrent.user.images[0].url
       ).getPalette();
