@@ -7,6 +7,10 @@ import type { Current } from './Current';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -43,6 +47,7 @@ section.receiveShadow = true;
 
 let renderer: THREE.WebGLRenderer;
 let controls: OrbitControls;
+let composer: EffectComposer;
 
 scene.add(bar);
 scene.add(beat);
@@ -103,18 +108,22 @@ const animate = () => {
   controls.autoRotateSpeed = c.analysis?.section.tempo / 70;
   controls.update();
 
-  renderer.render(scene, camera);
+  composer.render();
 };
 
 const resize = () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 };
 
 export const createScene = (el: HTMLCanvasElement) => {
   renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    powerPreference: "high-performance",
+	antialias: false,
+	stencil: false,
+	depth: true,
     alpha: true,
     canvas: el,
   });
@@ -122,6 +131,10 @@ export const createScene = (el: HTMLCanvasElement) => {
   controls = new OrbitControls(camera, renderer.domElement);
   controls.autoRotate = true;
   controls.enableDamping = true;
+
+  composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+
   resize();
   animate();
 };
