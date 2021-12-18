@@ -13,6 +13,7 @@
   class={$current?.analysis?.sections == undefined ? 'loading' : 'loaded'}
   bind:this={el}
 />
+<div class="background" />
 
 <style lang="scss">
   canvas {
@@ -20,15 +21,27 @@
     height: 100vh;
     flex-grow: 1;
     overflow: hidden;
-    transition: opacity 3s ease;
-    transition-delay: 500ms;
+    transition: opacity 2s ease;
+    transition-delay: 100ms;
     overflow: hidden;
     opacity: 1;
-
-    filter: drop-shadow(0 0 100px 10px rgba(0, 0, 0, 0.25));
-
+    z-index: 1;
     &.loading {
       opacity: 0;
     }
+  }
+
+  .background {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background: url('/stars.png') no-repeat center center fixed;
+    background-size: 50%;
+    background-repeat: repeat;
+    z-index: 0;
+
+    opacity: 0.2;
+    pointer-events: none;
+    animation: spin 500s linear infinite;
   }
 </style>

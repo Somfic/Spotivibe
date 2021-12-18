@@ -3,10 +3,12 @@ import * as THREE from 'three';
 
 import { current } from '../lib/stores';
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+
+let renderer: THREE.WebGLRenderer;
+let composer: EffectComposer;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -15,97 +17,93 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
+camera.position.z = 1;
 
-const geometry = new THREE.BoxGeometry();
+const clouds: THREE.Mesh[] = [];
 
-const barMaterial = new THREE.MeshStandardMaterial({
-  color: 0x00ff00,
+const loader = new THREE.TextureLoader();
+const cloudTexture1 = await loader.loadAsync('/cloud.png');
+const cloudTexture2 = await loader.loadAsync('/cloud2.png');
+const cloudTexture3 = await loader.loadAsync('/cloud3.png');
+
+const cloudTexture = [cloudTexture3];
+
+const cloudGeometry = new THREE.PlaneBufferGeometry(400, 400);
+const cloudMaterial = new THREE.MeshLambertMaterial({
+  // Pick a random cloud texture
+  map: cloudTexture[Math.floor(Math.random() * cloudTexture.length)],
   transparent: true,
-});
-const beatMaterial = new THREE.MeshStandardMaterial({
-  color: 0x0000ff,
-  transparent: true,
-});
-const sectionMaterial = new THREE.MeshStandardMaterial({
-  color: 0xffff00,
-  transparent: true,
+  opacity: 0.8,
 });
 
-const bar = new THREE.Mesh(geometry, barMaterial);
-const beat = new THREE.Mesh(geometry, beatMaterial);
-const section = new THREE.Mesh(geometry, sectionMaterial);
+const cloudsX = 800;
+const cloudsXOffset = 0;
 
-bar.castShadow = true;
-bar.receiveShadow = true;
-beat.castShadow = true;
-beat.receiveShadow = true;
-section.castShadow = true;
-section.receiveShadow = true;
+const cloudsY = 400;
+const cloudsYOffset = 100;
 
-let renderer: THREE.WebGLRenderer;
-let controls: OrbitControls;
-let composer: EffectComposer;
+const cloudsZ = 20;
+const cloudsZOffset = -400;
 
-scene.add(bar);
-scene.add(beat);
-scene.add(section);
+for (let p = 0; p < 100; p++) {
+  const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+  cloud.position.set(Math.random() * cloudsX * 2 - cloudsX + cloudsXOffset, Math.random() * cloudsY * 2 - cloudsY + cloudsYOffset, Math.random() * cloudsZ * 2 - cloudsZ + cloudsZOffset);
+  cloud.rotation.z = Math.random() * 2 * Math.PI;
+  cloud.material.opacity = 0.55;
+  clouds.push(cloud);
+  scene.add(cloud);
+}
 
-beat.position.x = -1.25;
-bar.position.x = 0;
-section.position.x = 1.25;
-
-camera.position.z = 3;
-
-const light1 = new THREE.DirectionalLight(0xffffff, 1);
-light1.position.x = 1;
-light1.position.y = 0.5;
-light1.position.z = 2;
+const light1 = new THREE.PointLight(0xff0000, 200);
+light1.position.x = -20;
+light1.position.y = -20;
+light1.position.z = cloudsZOffset;
 scene.add(light1);
 
-const light2 = new THREE.DirectionalLight(0xffffff, 1);
-light2.position.x = -1;
-light2.position.y = -0.5;
-light2.position.z = -2;
+const light2 = new THREE.PointLight(0x00ff00, 0.4);
+light2.position.x = 20;
+light2.position.y = 20;
+light2.position.z = 0;
 scene.add(light2);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(ambientLight);
+const directional = new THREE.DirectionalLight(0x0000ff, 1.4);
+directional.position.x = 100;
+directional.position.y = 100;
+directional.position.z = 1000;
+scene.add(directional);
+
+const ambient = new THREE.AmbientLight(0xffffff, 0.2);
+scene.add(ambient);
 
 const animate = () => {
   requestAnimationFrame(animate);
 
   const c = get(current);
 
-  if (c.analysis == undefined || c.analysis.sections == undefined) {
+  if (c.analysis == undefined || c.analysis.sections == undefined || c.colors == undefined || c.colors.DarkMuted == undefined) {
     return;
   }
 
-  barMaterial.color = new THREE.Color(c.colors?.LightMuted.hex);
-  beatMaterial.color = new THREE.Color(c.colors?.LightVibrant.hex);
-  sectionMaterial.color = new THREE.Color(c.colors?.Vibrant.hex);
-  light1.color = new THREE.Color(c.colors?.LightVibrant.hex);
-  light2.color = new THREE.Color(c.colors?.Vibrant.hex);
+  light1.color = new THREE.Color(c.colors?.Muted?.hex);
+  light2.color = new THREE.Color(c.colors?.DarkVibrant?.hex);
 
-  const bounce = 0.02;
+  directional.color = new THREE.Color(c.colors?.Vibrant?.hex);
+  ambient.color = new THREE.Color(c.colors?.LightVibrant?.hex);
 
-  const beatElapsed = Math.pow(c.analysis?.beat.elapsed, bounce);
-  const barElapsed = Math.pow(c.analysis?.bar.elapsed, bounce);
-  const sectionElapsed = Math.pow(c.analysis?.section.elapsed, 1);
+  light1.intensity =  ease(c.analysis?.beat.elapsed) * 200;
+  light2.intensity =  ease(c.analysis?.section.loudness / c.analysis?.segments.filter(x => x.loudness_max).reduce((a, b) => a + b.loudness_max, 0)) + 1;
+  ambient.intensity =  ease(1-c.analysis?.bar.elapsed) * 0.2;
+  directional.intensity = c.analysis?.section.loudness / c.analysis?.sections.filter(x => x.loudness).reduce((a, b) => a + b.loudness, 0)* 2;
 
-  bar.scale.setY(barElapsed);
-  bar.position.setY(barElapsed / 2 - 0.6);
-
-  beat.scale.setY(beatElapsed);
-  beat.position.setY(beatElapsed / 2 - 0.6);
-
-  section.scale.setY(sectionElapsed);
-  section.position.setY(sectionElapsed / 2 - 0.6);
-
-  // Rotate the camera around the scene
-  controls.autoRotateSpeed = c.analysis?.section.tempo / 70;
-  controls.update();
+  clouds.forEach(p => {
+    p.rotation.z -= c.analysis?.section?.tempo * 0.000005;
+  });
 
   composer.render();
+};
+
+const ease = (x: number) => {
+  return Math.pow(x, 0.3);
 };
 
 const resize = () => {
@@ -117,20 +115,18 @@ const resize = () => {
 
 export const createScene = (el: HTMLCanvasElement) => {
   renderer = new THREE.WebGLRenderer({
-    powerPreference: "high-performance",
-	antialias: true,
-	stencil: false,
-	depth: true,
+    powerPreference: 'high-performance',
+    antialias: true,
+    stencil: false,
+    depth: true,
     alpha: true,
     canvas: el,
   });
   renderer.setClearColor(0x000000, 0);
-  controls = new OrbitControls(camera, renderer.domElement);
-  controls.autoRotate = true;
-  controls.enableDamping = true;
 
   composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(1,1), 0.2, 5, 0));
 
   resize();
   animate();

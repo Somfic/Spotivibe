@@ -19,7 +19,7 @@
 
 </script>
 
-<main style={'background: ' + $current.colors?.DarkVibrant.hex + ';'}>
+<main style={'background: ' + $current.colors?.DarkMuted.hex + ';'}>
 {#if $isLoggedIn}
 	<div id="overlay"><Overlay /></div>
 	<div id="visualiser"><Visualiser/></div>
@@ -41,10 +41,11 @@
 		position: absolute;
 		min-width: 100vw;
 		min-height: 100vh;
+		overflow: hidden;
 	}
 
 	#overlay {
 		pointer-events: none;
-		z-index: 1;
+		z-index: 2;
 	}
 </style>

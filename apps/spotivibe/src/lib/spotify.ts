@@ -55,6 +55,9 @@ async function processSong(newCurrent: Current): Promise<Current> {
 
       const old = get(current);
 
+      newCurrent.colors = await Vibrant.from(song?.album.images[0].url).getPalette();
+      newCurrent.imageUri = song?.album.images[0].url;
+
       // Only update the audio analysis if the song has changed
       if (old.song == undefined || song?.id !== old.song.id) {
         newCurrent.song = song;
@@ -65,10 +68,6 @@ async function processSong(newCurrent: Current): Promise<Current> {
         newCurrent.features = (
           await spotify.getAudioFeaturesForTrack(newCurrent.playback?.item.id)
         ).body;
-        newCurrent.colors = await Vibrant.from(
-          song?.album.images[0].url
-        ).getPalette();
-        newCurrent.imageUri = song?.album.images[0].url;
 
         console.log(`New song: ${song?.name} by ${song?.artists[0].name}`);
         console.log(newCurrent.analysis);
