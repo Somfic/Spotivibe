@@ -12,6 +12,7 @@ export class Current {
   colors: Palette;
 
   isPlaying: boolean;
+  elapsed: number;
 
   imageUri: string;
   newCurrent: SpotifyApi.AudioAnalysisResponse;
@@ -24,5 +25,6 @@ export class Current {
     this.features = undefined;
     this.colors = undefined;
     (this.imageUri = ''), (this.isPlaying = false);
+    (this.elapsed = 0);
   }
 }

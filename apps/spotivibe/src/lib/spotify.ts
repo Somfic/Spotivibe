@@ -88,14 +88,14 @@ async function processSong(newCurrent: Current): Promise<Current> {
 }
 
 function processBeat(current: Current): Current {
-  const elapsed = (Date.now() - startedAt) / 1000;
+  current.elapsed = (Date.now() - startedAt) / 1000;
 
   if (current.analysis != undefined) {
-    current.analysis.bar = getPart(current.analysis.bars, elapsed);
-    current.analysis.beat = getPart(current.analysis.beats, elapsed);
-    current.analysis.section = getPart(current.analysis.sections, elapsed);
-    current.analysis.segment = getPart(current.analysis.segments, elapsed);
-    current.analysis.tatum = getPart(current.analysis.tatums, elapsed);
+    current.analysis.bar = getPart(current.analysis.bars, current.elapsed);
+    current.analysis.beat = getPart(current.analysis.beats, current.elapsed);
+    current.analysis.section = getPart(current.analysis.sections, current.elapsed);
+    current.analysis.segment = getPart(current.analysis.segments, current.elapsed);
+    current.analysis.tatum = getPart(current.analysis.tatums, current.elapsed);
   }
 
   return current;

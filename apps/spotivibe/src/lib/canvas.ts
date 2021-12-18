@@ -85,14 +85,14 @@ const animate = () => {
   }
 
   light1.color = new THREE.Color(c.colors?.Muted?.hex);
-  light2.color = new THREE.Color(c.colors?.DarkVibrant?.hex);
+  light2.color = new THREE.Color(c.colors?.Vibrant?.hex);
 
-  directional.color = new THREE.Color(c.colors?.Vibrant?.hex);
-  ambient.color = new THREE.Color(c.colors?.LightVibrant?.hex);
+  directional.color = new THREE.Color(c.colors?.DarkVibrant?.hex);
+  ambient.color = new THREE.Color(c.colors?.DarkMuted?.hex);
 
-  light1.intensity =  ease(c.analysis?.beat.elapsed) * 200;
-  light2.intensity =  ease(c.analysis?.section.loudness / c.analysis?.segments.filter(x => x.loudness_max).reduce((a, b) => a + b.loudness_max, 0)) + 1;
-  ambient.intensity =  ease(1-c.analysis?.bar.elapsed) * 0.2;
+  light1.intensity =  ease(1-c.analysis?.beat.elapsed) * 100 + 100;
+  light2.intensity =  c.analysis?.segment.loudness_max / c.analysis?.segments.filter(x => x.loudness_max).reduce((a, b) => a + b.loudness_max, 0) * 200;
+  ambient.intensity =  (1 - c.analysis?.bar.elapsed) * 0.2;
   directional.intensity = c.analysis?.section.loudness / c.analysis?.sections.filter(x => x.loudness).reduce((a, b) => a + b.loudness, 0)* 2;
 
   clouds.forEach(p => {
@@ -103,7 +103,7 @@ const animate = () => {
 };
 
 const ease = (x: number) => {
-  return Math.pow(x, 0.3);
+  return Math.pow(x, 2);
 };
 
 const resize = () => {
@@ -126,7 +126,7 @@ export const createScene = (el: HTMLCanvasElement) => {
 
   composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(new UnrealBloomPass(new THREE.Vector2(1,1), 0.2, 5, 0));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(5,5), 0.2, 0, 0));
 
   resize();
   animate();
