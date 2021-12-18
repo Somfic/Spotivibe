@@ -22,7 +22,7 @@
         <div class="song">
           <h1 class="fat">{$current.song?.name}</h1>
           <h2>{$current.song?.artists[0].name}</h2>
-          <div class="progress-bar" style="background-color: {$current.colors?.DarkVibrant.hex};">
+          <div class="progress-bar" style="background-color: {$current.colors?.Muted.hex};">
             <div class="progress" style="background-color: {$current.colors?.LightVibrant.hex}; width: {$current.elapsed / $current?.song?.duration_ms * 100000}%;" />
           </div>
         </div>
@@ -143,12 +143,12 @@
             box-shadow: 0 0 100px 10px rgba(0, 0, 0, 0.25);
             margin-bottom: -1rem;
             opacity: 0.7;
-            transition: all 100ms ease;
+            transition: background-color 2s ease;
 
             .progress {
               height: 2px;
               border-radius: 100px;
-              transition: all 100ms ease;
+              transition: background-color 2s ease;
             }
           }
         }
