@@ -1,15 +1,12 @@
-import { nextTick } from 'process';
 import { get } from 'svelte/store';
 import * as THREE from 'three';
 
 import { current } from '../lib/stores';
-import type { Current } from './Current';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -121,7 +118,7 @@ const resize = () => {
 export const createScene = (el: HTMLCanvasElement) => {
   renderer = new THREE.WebGLRenderer({
     powerPreference: "high-performance",
-	antialias: false,
+	antialias: true,
 	stencil: false,
 	depth: true,
     alpha: true,
