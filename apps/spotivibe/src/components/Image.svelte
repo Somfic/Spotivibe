@@ -27,7 +27,7 @@
 
         &.loaded {
             opacity: 1;
-            box-shadow: 0 0 10px 10px red;
+            box-shadow: 0 0 10px 10px rgba(0,0,0,0.5);
         }
     }
 </style>
