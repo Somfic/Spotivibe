@@ -26,14 +26,14 @@ const cloudTexture1 = await loader.loadAsync('/cloud.png');
 const cloudTexture2 = await loader.loadAsync('/cloud2.png');
 const cloudTexture3 = await loader.loadAsync('/cloud3.png');
 
-const cloudTexture = [cloudTexture3];
+const cloudTexture = [cloudTexture1];
 
 const cloudGeometry = new THREE.PlaneBufferGeometry(400, 400);
 const cloudMaterial = new THREE.MeshLambertMaterial({
   // Pick a random cloud texture
   map: cloudTexture[Math.floor(Math.random() * cloudTexture.length)],
   transparent: true,
-  opacity: 0.8,
+  opacity: 0.1,
 });
 
 const cloudsX = 800;
