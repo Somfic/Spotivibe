@@ -1,8 +1,0 @@
-{
-  "version": 2,
-  "projects": {
-    "server-api": "apps/server-api",
-    "spotivibe": "apps/spotivibe",
-    "spotivibe-e2e": "apps/spotivibe-e2e"
-  }
-}
