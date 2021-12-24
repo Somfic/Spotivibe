@@ -39,10 +39,10 @@ const cloudMaterial = new THREE.MeshLambertMaterial({
 const cloudsX = 800;
 const cloudsXOffset = 0;
 
-const cloudsY = 400;
+const cloudsY = 200;
 const cloudsYOffset = 100;
 
-const cloudsZ = 20;
+const cloudsZ = 100;
 const cloudsZOffset = -400;
 
 for (let p = 0; p < 100; p++) {
@@ -54,26 +54,21 @@ for (let p = 0; p < 100; p++) {
   scene.add(cloud);
 }
 
-const light1 = new THREE.PointLight(0xff0000, 200);
-light1.position.x = -20;
-light1.position.y = -20;
-light1.position.z = cloudsZOffset;
+const light1 = new THREE.PointLight(0xff0000, 0);
+light1.position.set(200, 300, -200)
 scene.add(light1);
 
-const light2 = new THREE.PointLight(0x00ff00, 0.4);
-light2.position.x = 20;
-light2.position.y = 20;
-light2.position.z = 0;
+const light2 = new THREE.PointLight(0x00ff00, 0);
+light2.position.set(100, 0, -380);
 scene.add(light2);
 
-const directional = new THREE.DirectionalLight(0x0000ff, 1.4);
-directional.position.x = 100;
-directional.position.y = 100;
-directional.position.z = 1000;
-scene.add(directional);
+const light3 = new THREE.PointLight(0x00ff00, 0);
+light3.position.set(-100, 300, -100);
+scene.add(light3);
 
-const ambient = new THREE.AmbientLight(0xffffff, 0.2);
-scene.add(ambient);
+const directional = new THREE.DirectionalLight(0x0000ff, 0);
+directional.position.set(0, 0, 1)
+scene.add(directional);
 
 const animate = () => {
   requestAnimationFrame(animate);
@@ -86,17 +81,25 @@ const animate = () => {
 
   light1.color = new THREE.Color(c.colors?.Muted?.hex);
   light2.color = new THREE.Color(c.colors?.Vibrant?.hex);
+  light3.color = new THREE.Color(c.colors?.LightVibrant?.hex);
 
   directional.color = new THREE.Color(c.colors?.DarkVibrant?.hex);
-  ambient.color = new THREE.Color(c.colors?.DarkMuted?.hex);
+  directional.intensity = ease(c.analysis?.beat.elapsed) * 0.1;
 
-  light1.intensity =  ease(1-c.analysis?.beat.elapsed) * 100 + 100;
-  light2.intensity =  c.analysis?.segment.loudness_max / c.analysis?.segments.filter(x => x.loudness_max).reduce((a, b) => a + b.loudness_max, 0) * 200;
-  ambient.intensity =  (1 - c.analysis?.bar.elapsed) * 0.2;
-  directional.intensity = c.analysis?.section.loudness / c.analysis?.sections.filter(x => x.loudness).reduce((a, b) => a + b.loudness, 0)* 2;
+  //light2.intensity =  c.analysis?.segment.loudness_max / c.analysis?.segments.filter(x => x.loudness_max).reduce((a, b) => a + b.loudness_max, 0) * 200;
+  light1.intensity = -1 / (c.analysis?.section?.loudness - 2) * 10;
+  light2.intensity = -1 / (c.analysis?.segment?.loudness_max) * 100;
+  light3.intensity = ease(c.analysis?.bar.elapsed) * 0.1;
 
   clouds.forEach(p => {
     p.rotation.z -= c.analysis?.section?.tempo * 0.000005;
+    p.position.x += c.analysis?.section?.tempo * 0.000003* -p.position.z;
+
+    if(p.position.x > cloudsX) {
+      p.position.x = -cloudsX;
+      p.position.y = Math.random() * cloudsY * 2 - cloudsY + cloudsYOffset;
+      p.position.z = Math.random() * cloudsZ * 2 - cloudsZ + cloudsZOffset;
+    }
   });
 
   composer.render();
@@ -126,7 +129,7 @@ export const createScene = (el: HTMLCanvasElement) => {
 
   composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(new UnrealBloomPass(new THREE.Vector2(5,5), 0.2, 0, 0));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(5,5), 0.2, 2, 0));
 
   resize();
   animate();
