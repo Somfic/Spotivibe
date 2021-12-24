@@ -24,10 +24,11 @@
         opacity: 0;
         transition: opacity 500ms ease;
         margin: 0px;
+        box-shadow: 0 0 100px 10px rgba(0, 0, 0, 0.25);
+          border-radius: 10px;
 
         &.loaded {
             opacity: 1;
-            box-shadow: 0 0 10px 10px rgba(0,0,0,0.5);
         }
     }
 </style>
