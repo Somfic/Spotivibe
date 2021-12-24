@@ -44,7 +44,7 @@
           </div>
         </div>
       </div>
-      <div class="colors">
+      <!-- <div class="colors">
         <div
           class="color"
           style="background-color: {$current.colors?.LightMuted.hex};"
@@ -82,7 +82,7 @@
         >
           <h1>Dark Vibrant</h1>
         </div>
-      </div>
+      </div> -->
     </div>
   {:else}
     <div class="no-music">
