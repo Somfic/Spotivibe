@@ -87,13 +87,13 @@ const animate = () => {
   directional.intensity = ease(c.analysis?.beat.elapsed) * 0.1;
 
   //light2.intensity =  c.analysis?.segment.loudness_max / c.analysis?.segments.filter(x => x.loudness_max).reduce((a, b) => a + b.loudness_max, 0) * 200;
-  light1.intensity = -1 / (c.analysis?.section?.loudness - 2) * 10;
-  light2.intensity = -1 / (c.analysis?.segment?.loudness_max) * 100;
-  light3.intensity = ease(c.analysis?.bar.elapsed) * 0.1;
+  light1.intensity = -1 / (c.analysis?.section?.loudness) * 8;
+  light2.intensity = -1 / (c.analysis?.segment?.loudness_max) * 300;
+  light3.intensity = ease(c.analysis?.bar.elapsed) * 0.25;
 
   clouds.forEach(p => {
-    p.rotation.z -= c.analysis?.section?.tempo * 0.000005;
-    p.position.x += c.analysis?.section?.tempo * 0.000003* -p.position.z;
+    p.rotation.z -= c.analysis?.section?.tempo * 0.000000006 * -p.position.z;
+    p.position.x += c.analysis?.section?.tempo * 0.000002 * -p.position.z;
 
     if(p.position.x > cloudsX) {
       p.position.x = -cloudsX;
@@ -106,7 +106,7 @@ const animate = () => {
 };
 
 const ease = (x: number) => {
-  return Math.pow(x, 2);
+  return Math.pow(x, 0.05);
 };
 
 const resize = () => {
