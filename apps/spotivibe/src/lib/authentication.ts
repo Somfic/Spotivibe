@@ -2,7 +2,7 @@ import { spotify } from "./spotify";
 
 import { isLoggedIn } from "./stores";
 
-const API_URL = "http://localhost:3333/api";
+const API_URL = window.location.hostname == 'localhost' ? "http://localhost:3333/api" : "https://spotivibe.herokuapp.com/api";
 
 export function login() : void {
     window.location.href = `${API_URL}/login`;
