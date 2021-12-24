@@ -4,9 +4,14 @@
  */
 
 import express from 'express';
+import * as path from 'path';
 import SpotifyWebApi from "spotify-web-api-node";
 
 const app = express();
+
+const CLIENT_BUILD_PATH = path.join(__dirname, '../spotivibe');
+
+app.use(express.static(CLIENT_BUILD_PATH));
 
 app.get('/api/callback', (req, res) => {
   try {
