@@ -6,6 +6,19 @@ import { current } from '../lib/stores';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import type { Color } from 'three';
+
+function lerp(a: number, b: number, t = 0.5) {
+  return (1 - t) * a + t * b;
+}
+
+function lerpColor(a: Color, b: Color, t = 0.01) {
+  const rColor = lerp(a.r, b.r, t);
+  const gColor = lerp(a.g, b.g, t);
+  const bColor = lerp(a.b, b.b, t);
+
+  return new THREE.Color(rColor, gColor, bColor);
+}
 
 let renderer: THREE.WebGLRenderer;
 let composer: EffectComposer;
@@ -55,11 +68,11 @@ for (let p = 0; p < 100; p++) {
 }
 
 const light1 = new THREE.PointLight(0xff0000, 0);
-light1.position.set(200, 300, -200)
+light1.position.set(-300, -200, -200)
 scene.add(light1);
 
 const light2 = new THREE.PointLight(0x00ff00, 0);
-light2.position.set(100, 0, -380);
+light2.position.set(300, 0, -300);
 scene.add(light2);
 
 const light3 = new THREE.PointLight(0x00ff00, 0);
@@ -75,21 +88,24 @@ const animate = () => {
 
   const c = get(current);
 
-  if (c.analysis == undefined || c.analysis.sections == undefined || c.colors == undefined || c.colors.DarkMuted == undefined) {
+  if (c.analysis == undefined || c.analysis.bar.elapsed == undefined || c.analysis.sections == undefined || c.colors == undefined || c.colors.DarkMuted == undefined) {
     return;
   }
 
-  light1.color = new THREE.Color(c.colors?.Muted?.hex);
-  light2.color = new THREE.Color(c.colors?.Vibrant?.hex);
-  light3.color = new THREE.Color(c.colors?.LightVibrant?.hex);
+  light1.color = lerpColor(light1.color, new THREE.Color(c.colors?.Muted?.hex));
+  light2.color = lerpColor(light2.color, new THREE.Color(c.colors?.Vibrant?.hex));
+  light3.color = lerpColor(light3.color, new THREE.Color(c.colors?.LightVibrant?.hex));
+  directional.color = lerpColor(directional.color, new THREE.Color(c.colors?.DarkVibrant?.hex));
 
-  directional.color = new THREE.Color(c.colors?.DarkVibrant?.hex);
-  directional.intensity = ease(c.analysis?.beat.elapsed) * 0.1;
 
-  //light2.intensity =  c.analysis?.segment.loudness_max / c.analysis?.segments.filter(x => x.loudness_max).reduce((a, b) => a + b.loudness_max, 0) * 200;
-  light1.intensity = -1 / (c.analysis?.section?.loudness) * 8;
-  light2.intensity = -1 / (c.analysis?.segment?.loudness_max) * 300;
-  light3.intensity = ease(c.analysis?.bar.elapsed) * 0.25;
+  light1.intensity = lerp( light1.intensity, -1 / (c.analysis?.section?.loudness) * 8, 0.08);
+  light2.intensity = lerp( light2.intensity, -1 / (c.analysis?.segment?.loudness_max) * 10, 0.8);
+  light3.intensity = lerp( light3.intensity , ease(c.analysis?.beat?.elapsed) * 0.2, 0.6);
+  directional.intensity = lerp(directional.intensity, ease(c.analysis?.tatum?.elapsed) * 0.5);
+
+  light1.intensity = Math.max(0.1, light1.intensity);
+  light2.intensity = Math.max(0.1, light2.intensity);
+
 
   clouds.forEach(p => {
     p.rotation.z -= c.analysis?.section?.tempo * 0.000000006 * -p.position.z;
