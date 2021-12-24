@@ -6,8 +6,8 @@
   import { logout } from '../lib/authentication';
   import { current } from '../lib/stores';
 
-  import Button from '../components/button.svelte';
-  import Image from '../components/image.svelte';
+  import Button from '../components/Button.svelte';
+  import Image from '../components/Image.svelte';
 </script>
 
 <section>
