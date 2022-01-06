@@ -11,7 +11,6 @@ export class Current {
 
   colors: Palette;
 
-  isPlaying: boolean;
   elapsed: number;
 
   imageUri: string;
@@ -24,7 +23,7 @@ export class Current {
     this.analysis = undefined;
     this.features = undefined;
     this.colors = undefined;
-    (this.imageUri = ''), (this.isPlaying = false);
-    (this.elapsed = 0);
+    this.imageUri = '';
+    this.elapsed = 0;
   }
 }
