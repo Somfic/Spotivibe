@@ -97,11 +97,17 @@ const animate = () => {
   light3.color = lerpColor(light3.color, new THREE.Color(c.colors?.LightVibrant?.hex));
   directional.color = lerpColor(directional.color, new THREE.Color(c.colors?.DarkVibrant?.hex));
 
-
-  light1.intensity = lerp( light1.intensity, -1 / (c.analysis?.section?.loudness) * 8, 0.08);
-  light2.intensity = lerp( light2.intensity, -1 / (c.analysis?.segment?.loudness_max) * 10, 0.8);
-  light3.intensity = lerp( light3.intensity , ease(c.analysis?.beat?.elapsed) * 0.2, 0.6);
-  directional.intensity = lerp(directional.intensity, ease(c.analysis?.tatum?.elapsed) * 0.5);
+  if(c.playback.is_playing) {
+    light1.intensity = lerp( light1.intensity, -1 / (c.analysis?.section?.loudness) * 8, 0.08);
+    light2.intensity = lerp( light2.intensity, -1 / (c.analysis?.segment?.loudness_max) * 10, 0.8);
+    light3.intensity = lerp( light3.intensity , ease(c.analysis?.beat?.elapsed) * 0.2, 0.6);
+    directional.intensity = lerp(directional.intensity, ease(c.analysis?.beat?.elapsed) * 1.5, 0.6);
+  } else {
+    light1.intensity = lerp(light1.intensity, 1, 0.002);
+    light2.intensity = lerp(light2.intensity, 1, 0.002);
+    light3.intensity = lerp(light3.intensity, 0.25, 0.002);
+    directional.intensity = lerp(directional.intensity, 0.25, 0.002);
+  }
 
   light1.intensity = Math.max(0.1, light1.intensity);
   light2.intensity = Math.max(0.1, light2.intensity);
@@ -145,7 +151,7 @@ export const createScene = (el: HTMLCanvasElement) => {
 
   composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(new UnrealBloomPass(new THREE.Vector2(5,5), 0.2, 2, 0));
+ // composer.addPass(new UnrealBloomPass(new THREE.Vector2(5,5), 0.2, 2, 0));
 
   resize();
   animate();
